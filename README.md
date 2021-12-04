@@ -1,6 +1,6 @@
-# The weakreference_bc PECL extension (name TBD)
+# The weakreference_bc PECL extension
 
-**This is a fork of the unmaintained https://pecl.php.net/weakref that changes the API to provide polyfills for WeakReference/WeakMap**
+**This is a fork of the unmaintained https://pecl.php.net/weakref PECL. The `weakreference_bc` PECL changes the API to provide polyfills for [WeakReference](https://www.php.net/manual/en/class.weakreference.php)/[WeakMap](https://www.php.net/manual/en/class.weakmap.php)**
 
 A weak reference provides a gateway to an object without preventing that object
 from being collected by the garbage collector (GC). It allows to associate
@@ -9,12 +9,12 @@ information to objects. Indeed, the cache entry should not be preventing the
 garbage collection of the object AND the cached info when the object is no
 longer used.
 
-More information about releases can be found on https://pecl.php.net/weakref
-
 ## WeakReference
 The WeakReference class is a simple class that allows to access its referenced object
 as long as it exists. Unlike other references, having this WeakReference object will
 not prevent the object to be collected.
+
+See https://www.php.net/manual/en/class.weakreference.php
 
 ```php
 <?php
@@ -26,9 +26,9 @@ class MyClass {
 
 $o1 = new MyClass;
 
-$r1 = new WeakReference($o1);
+$r1 = WeakReference::create($o1);
 
-if ($r1->valid()) { // It does
+if (is_object($r1->get())) { // It does have a reference
     echo "Object still exists!\n";
     var_dump($r1->get());
 } else {
@@ -37,7 +37,7 @@ if ($r1->valid()) { // It does
 
 unset($o1);
 
-if ($r1->valid()) { // It doesn't
+if (is_object($r1->get())) { // It doesn't have a reference
     echo "Object still exists!\n";
     var_dump($r1->get());
 } else {
@@ -50,6 +50,9 @@ if ($r1->valid()) { // It doesn't
 The Weakmap class is very similar to WeakReference, only that it also allows to
 associate data to each object. When the target object gets destroyed, the
 associated data is automatically freed.
+
+This is similar to https://www.php.net/manual/en/class.weakmap.php
+(but currently implements Iterator instead of IteratorAggregate)
 
 ```php
 <?php

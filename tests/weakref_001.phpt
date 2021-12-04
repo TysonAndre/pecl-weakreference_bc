@@ -6,15 +6,13 @@ $o = new StdClass;
 
 $wr = WeakReference::create($o);
 
-var_dump($wr->valid(), $wr->get());
+var_dump($wr->get());
 unset($o);
-var_dump($wr->valid(), $wr->get());
+var_dump($wr->get());
 ?>
 ==END==
 --EXPECTF--
-bool(true)
 object(stdClass)#1 (0) {
 }
-bool(false)
 NULL
 ==END==

@@ -119,20 +119,6 @@ PHP_METHOD(WeakReference, get)
 }
 /* }}} */
 
-/* {{{ proto bool WeakReference::valid()
- Return whether the reference still valid. */
-PHP_METHOD(WeakReference, valid)
-{
-	wr_weakref_object *wref = Z_WEAKREF_OBJ_P(getThis());
-
-	if (zend_parse_parameters_none() == FAILURE) {
-		return;
-	}
-
-	RETURN_BOOL(wref->valid);
-}
-/* }}} */
-
 /* {{{ proto noreturn WeakReference::__construct()
 */
 ZEND_COLD PHP_METHOD(WeakReference, __construct)
@@ -186,7 +172,6 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry wr_funcsWeakReference[] = {
 	PHP_ME(WeakReference, __construct,     arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
 	PHP_ME(WeakReference, create,          arginfo_wr_weakref_obj,             ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(WeakReference, valid,           arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
 	PHP_ME(WeakReference, get,             arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };

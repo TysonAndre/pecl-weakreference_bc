@@ -14,12 +14,12 @@ $wr3 = WeakReference::create($o);
 
 unset($o);
 
-var_dump($wr1->valid());
+var_dump($wr1->get());
 var_dump($wr1 === $wr3);
 ?>
 ==END==
 --EXPECTF--
 Caught: Trying to clone an uncloneable object of class WeakReference
-bool(false)
+NULL
 bool(true)
 ==END==
