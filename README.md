@@ -1,4 +1,7 @@
-# The Weakref PECL extension
+# The weakreference_bc PECL extension (name TBD)
+
+**This is a fork of https://pecl.php.net/weakref that provides polyfills for WeakReference/WeakMap**
+
 A weak reference provides a gateway to an object without preventing that object
 from being collected by the garbage collector (GC). It allows to associate
 information to volatile object. It is useful to associate metadata or cache
@@ -6,11 +9,11 @@ information to objects. Indeed, the cache entry should not be preventing the
 garbage collection of the object AND the cached info when the object is no
 longer used.
 
-More information about releases can be found on http://pecl.php.net/weakref
+More information about releases can be found on https://pecl.php.net/weakref
 
-## Weakref
+## WeakReference
 The weakref class is a simple class that allows to access its referenced object
-as long as it exists. Unlike other references, having this Weakref object will
+as long as it exists. Unlike other references, having this WeakReference object will
 not prevent the object to be collected.
 
 ```php
@@ -23,7 +26,7 @@ class MyClass {
 
 $o1 = new MyClass;
 
-$r1 = new Weakref($o1);
+$r1 = new WeakReference($o1);
 
 if ($r1->valid()) { // It does
     echo "Object still exists!\n";
@@ -44,7 +47,7 @@ if ($r1->valid()) { // It doesn't
 ```
 
 ## Weakmap
-The Weakmap class is very similar to Weakref, only that it also allows to
+The Weakmap class is very similar to WeakReference, only that it also allows to
 associate data to each object. When the target object gets destroyed, the
 associated data is automatically freed.
 
@@ -70,7 +73,7 @@ var_dump(count($wm)); // int(0)
 ?>
 ```
 
-As of PHP7, iterating WeakMap provides access to both the key (the reference)
+Iterating over WeakMap provides access to both the key (the reference)
 and the value:
 
 ```php
