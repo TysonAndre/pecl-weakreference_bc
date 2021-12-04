@@ -4,7 +4,7 @@ Weakref: usage
 <?php
 $o = new StdClass;
 
-$wr = new WeakRef($o);
+$wr = new WeakReference($o);
 
 var_dump($wr->valid(), $wr->get());
 unset($o);

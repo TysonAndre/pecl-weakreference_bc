@@ -4,7 +4,7 @@ Weakref: cloning
 <?php
 $o = new StdClass;
 
-$wr1 = new WeakRef($o);
+$wr1 = new WeakReference($o);
 $wr2 = clone $wr1;
 
 unset($o);

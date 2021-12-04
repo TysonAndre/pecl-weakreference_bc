@@ -180,9 +180,9 @@ static zend_object* wr_weakref_object_new(zend_class_entry *ce) /* {{{ */
 }
 /* }}} */
 
-/* {{{ proto object WeakRef::get()
+/* {{{ proto object WeakReference::get()
  Return the reference, or null. */
-PHP_METHOD(WeakRef, get)
+PHP_METHOD(WeakReference, get)
 {
 	wr_weakref_object *wref = Z_WEAKREF_OBJ_P(getThis());
 	zval ret;
@@ -200,45 +200,9 @@ PHP_METHOD(WeakRef, get)
 }
 /* }}} */
 
-/* {{{ proto bool WeakRef::acquire()
- Return the reference, or null. */
-PHP_METHOD(WeakRef, acquire)
-{
-	wr_weakref_object *wref = Z_WEAKREF_OBJ_P(getThis());
-
-	if (zend_parse_parameters_none() == FAILURE) {
-		return;
-	}
-
-	if (wr_weakref_ref_acquire(wref) == SUCCESS) {
-		RETURN_TRUE;
-	} else {
-		RETURN_FALSE;
-	}
-}
-/* }}} */
-
-/* {{{ proto bool WeakRef::release()
- Return the reference, or null. */
-PHP_METHOD(WeakRef, release)
-{
-	wr_weakref_object *wref = Z_WEAKREF_OBJ_P(getThis());
-
-	if (zend_parse_parameters_none() == FAILURE) {
-		return;
-	}
-
-	if (wr_weakref_ref_release(wref) == SUCCESS) {
-		RETURN_TRUE;
-	} else {
-		RETURN_FALSE;
-	}
-}
-/* }}} */
-
-/* {{{ proto bool WeakRef::valid()
+/* {{{ proto bool WeakReference::valid()
  Return whether the reference still valid. */
-PHP_METHOD(WeakRef, valid)
+PHP_METHOD(WeakReference, valid)
 {
 	wr_weakref_object *wref = Z_WEAKREF_OBJ_P(getThis());
 
@@ -250,9 +214,9 @@ PHP_METHOD(WeakRef, valid)
 }
 /* }}} */
 
-/* {{{ proto void WeakRef::__construct(object ref)
+/* {{{ proto void WeakReference::__construct(object ref)
 */
-PHP_METHOD(WeakRef, __construct)
+PHP_METHOD(WeakReference, __construct)
 {
 	zval *ref;
 	zend_object *wref_obj   = Z_OBJ_P(getThis());
@@ -279,11 +243,9 @@ ZEND_BEGIN_ARG_INFO(arginfo_wr_weakref_obj, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry wr_funcs_WeakRef[] = {
-	PHP_ME(WeakRef, __construct,     arginfo_wr_weakref_obj,             ZEND_ACC_PUBLIC)
-	PHP_ME(WeakRef, valid,           arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
-	PHP_ME(WeakRef, get,             arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
-	PHP_ME(WeakRef, acquire,         arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
-	PHP_ME(WeakRef, release,         arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
+	PHP_ME(WeakReference, __construct,     arginfo_wr_weakref_obj,             ZEND_ACC_PUBLIC)
+	PHP_ME(WeakReference, valid,           arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
+	PHP_ME(WeakReference, get,             arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 /* }}} */
@@ -292,7 +254,7 @@ PHP_MINIT_FUNCTION(wr_weakref) /* {{{ */
 {
 	zend_class_entry weakref_ce;
 
-	INIT_CLASS_ENTRY(weakref_ce, "WeakRef", wr_funcs_WeakRef);
+	INIT_CLASS_ENTRY(weakref_ce, "WeakReference", wr_funcs_WeakRef);
 
 	wr_ce_WeakRef = zend_register_internal_class(&weakref_ce);
 

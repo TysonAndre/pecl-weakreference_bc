@@ -6,7 +6,7 @@ Weakref: Destroying the weakref within the std dtor of the object
 class A {
     private $wr = null;
     public function __construct() {
-        $this->wr = new WeakRef($this);
+        $this->wr = new WeakReference($this);
     }
     public function __destruct() {
         unset($this->wr);
