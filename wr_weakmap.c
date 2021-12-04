@@ -315,6 +315,22 @@ PHP_METHOD(WeakMap, next)
 	zend_hash_move_forward_ex(&wmap->map, &wmap->pos);
 } /* }}} */
 
+/* {{{ proto noreturn WeakMap::__wakeup()
+*/
+ZEND_COLD PHP_METHOD(WeakMap, __wakeup)
+{
+	zend_throw_exception(NULL, "Unserialization of 'WeakMap' is not allowed", 0);
+}
+/* }}} */
+
+/* {{{ proto noreturn WeakMap::__sleep()
+*/
+ZEND_COLD PHP_METHOD(WeakMap, __sleep)
+{
+	zend_throw_exception(NULL, "Serialization of 'WeakMap' is not allowed", 0);
+}
+/* }}} */
+
 /*  Function/Class/Method definitions */
 ZEND_BEGIN_ARG_INFO(arginfo_wr_weakmap_void, 0)
 ZEND_END_ARG_INFO()
@@ -342,6 +358,8 @@ static const zend_function_entry wr_funcs_WeakMap[] = {
 	PHP_ME(WeakMap,  key,            arginfo_wr_weakmap_void,      ZEND_ACC_PUBLIC)
 	PHP_ME(WeakMap,  current,        arginfo_wr_weakmap_void,      ZEND_ACC_PUBLIC)
 	PHP_ME(WeakMap,  next,           arginfo_wr_weakmap_void,      ZEND_ACC_PUBLIC)
+	PHP_ME(WeakMap, __wakeup,        arginfo_wr_weakmap_void,      ZEND_ACC_PUBLIC)
+	PHP_ME(WeakMap, __sleep,         arginfo_wr_weakmap_void,      ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 /* }}} */
@@ -356,6 +374,8 @@ PHP_MINIT_FUNCTION(wr_weakmap) /* {{{ */
 
 	wr_ce_WeakMap->ce_flags        |= ZEND_ACC_FINAL;
 	wr_ce_WeakMap->create_object    = wr_weakmap_object_new;
+	wr_ce_WeakMap->serialize        = zend_class_serialize_deny;
+	wr_ce_WeakMap->unserialize      = zend_class_unserialize_deny;
 
 	memcpy(&wr_handler_WeakMap, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 

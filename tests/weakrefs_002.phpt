@@ -20,6 +20,10 @@ try {
     var_dump($ex->getMessage());
 }
 ?>
---EXPECT--
+--EXPECTF--
 string(47) "Serialization of 'WeakReference' is not allowed"
-string(49) "Unserialization of 'WeakReference' is not allowed"
+
+Warning: Erroneous data format for unserializing 'WeakReference' in %s on line 13
+
+Notice: unserialize(): Error at offset 24 of 25 bytes in %s on line 13
+bool(false)

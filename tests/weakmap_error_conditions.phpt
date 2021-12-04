@@ -62,12 +62,19 @@ try {
 }
 
 try {
-    serialize($map);
+    var_dump(serialize($map));
 } catch (Exception $e) {
     echo $e->getMessage(), "\n";
 }
+echo "test Serializable\n";
 try {
-    unserialize('C:7:"WeakMap":0:{}');
+    var_dump(unserialize('C:7:"WeakMap":0:{}'));
+} catch (Exception $e) {
+    echo $e->getMessage(), "\n";
+}
+echo "test object\n";
+try {
+    var_dump(unserialize('O:7:"WeakMap":0:{}'));
 } catch (Exception $e) {
     echo $e->getMessage(), "\n";
 }
@@ -95,5 +102,12 @@ NULL
 bool(false)
 
 Warning: Cannot use a scalar value as an array in %s on line 51
+Serialization of 'WeakMap' is not allowed
+test Serializable
+Unserialization of 'WeakMap' is not allowed
+test object
 
-Warning: Class WeakMap has no unserializer in %s on line 67
+Warning: Erroneous data format for unserializing 'WeakMap' in %s on line 74
+
+Notice: unserialize(): Error at offset 17 of 18 bytes in %s on line 74
+bool(false)

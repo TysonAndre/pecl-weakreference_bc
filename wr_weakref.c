@@ -27,6 +27,7 @@
 
 #include "php.h"
 #include "zend_exceptions.h"
+#include "Zend/zend_interfaces.h"
 #include "ext/standard/info.h"
 #include "ext/spl/spl_exceptions.h"
 #include "wr_weakref.h"
@@ -236,6 +237,8 @@ PHP_MINIT_FUNCTION(wr_weakref) /* {{{ */
 
 	wr_ceWeakReference->ce_flags      |= ZEND_ACC_FINAL;
 	wr_ceWeakReference->create_object  = wr_weakref_object_new;
+	wr_ceWeakReference->serialize      = zend_class_serialize_deny;
+	wr_ceWeakReference->unserialize    = zend_class_unserialize_deny;
 
 	memcpy(&wr_handlerWeakReference, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 
