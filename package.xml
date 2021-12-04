@@ -3,30 +3,32 @@
 http://pear.php.net/dtd/tasks-1.0.xsd
 http://pear.php.net/dtd/package-2.0
 http://pear.php.net/dtd/package-2.0.xsd">
- <name>Weakref</name>
+ <name>weakreference_bc</name>
  <channel>pecl.php.net</channel>
- <summary>Implementation of weak references</summary>
+ <summary>Polyfill of WeakMap/WeakReference for older versions. This is a fork of the abandoned "weakref" PECL.</summary>
  <description>
   A weak reference provides a gateway to an object without preventing that object from being collected by the garbage collector (GC).
  </description>
  <lead>
-  <name>Etienne Kneuss</name>
-  <user>colder</user>
-  <email>colder@php.net</email>
+  <name>Tyson Andre</name>
+  <user>tandre</user>
+  <email>tandre@php.net</email>
   <active>yes</active>
  </lead>
- <date>2016-12-13</date>
+ <date>2021-12-04</date>
  <version>
-  <release>0.3.3</release>
-  <api>0.3.1</api>
+  <release>0.4.0</release>
+  <api>0.4.0</api>
  </version>
  <stability>
   <release>beta</release>
   <api>beta</api>
  </stability>
- <license uri="http://www.php.net/license">PHP</license>
+ <license uri="https://www.php.net/license">PHP</license>
  <notes>
-- Restore dtors to prevent crash in multi-requests scenario
+- Fork this from "weakref" PECL
+- Fix compilation errors for WeakMap in php 7.4
+- Rename WeakRef to WeakReference to act as a polyfill for WeakReference in php before php 7.4.
  </notes>
  <contents>
   <dir name="/">
@@ -68,6 +70,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <required>
    <php>
     <min>7.0.0</min>
+    <max>8.0.0</max>
    </php>
    <pearinstaller>
     <min>1.4.0b1</min>
