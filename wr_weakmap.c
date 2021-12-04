@@ -41,10 +41,10 @@ static inline wr_weakmap_object* wr_weakmap_fetch(zend_object *obj) {
 
 #define Z_WEAKMAP_OBJ_P(zv) wr_weakmap_fetch(Z_OBJ_P(zv));
 
-static void wr_weakmap_ref_dtor(zend_object *wmap_obj, zend_object *ref_obj) { /* {{{ */
+static void wr_weakmap_ref_dtor(zend_object *wmap_obj, zend_object *ref_obj, uint32_t handle) { /* {{{ */
 	wr_weakmap_object *wmap = wr_weakmap_fetch(wmap_obj);
 
-	zend_hash_index_del(&wmap->map, ref_obj->handle);
+	zend_hash_index_del(&wmap->map, handle);
 }
 /* }}} */
 
@@ -53,9 +53,10 @@ static void wr_weakmap_object_free_storage(zend_object *wmap_obj) /* {{{ */
 	wr_weakmap_object *wmap = wr_weakmap_fetch(wmap_obj);
 
 	wr_weakmap_refval *refval;
+    zend_long handle;
 
-	ZEND_HASH_FOREACH_PTR(&wmap->map, refval) {
-		wr_store_untrack(wmap_obj, refval->ref);
+	ZEND_HASH_FOREACH_NUM_KEY_PTR(&wmap->map, handle, refval) {
+		wr_store_untrack(wmap_obj, refval->ref, handle);
 	} ZEND_HASH_FOREACH_END();
 
 	zend_hash_destroy(&wmap->map);
@@ -198,12 +199,13 @@ PHP_METHOD(WeakMap, offsetSet)
 	if (zv) {
 		ZEND_ASSERT(Z_TYPE_P(zv) == IS_PTR);
 		wr_weakmap_refval *refval = Z_PTR_P(zv);
-		ZEND_ASSERT(refval->ref == obj_key);
+		//ZEND_ASSERT(refval->ref == obj_key);
+		refval->ref = obj_key;
 		/* Because the destructors can have side effects such as resizing or rehashing the WeakMap storage,
 		 * free the zval only after overwriting the original value. */
 		zval zv_orig;
 		ZVAL_COPY_VALUE(&zv_orig, &refval->val);
-		ZVAL_COPY(&refval->val, val_zv);
+		ZVAL_COPY_VALUE(&refval->val, val_zv);
 		zval_ptr_dtor(&zv_orig);
 		return;
 	}
@@ -226,8 +228,11 @@ PHP_METHOD(WeakMap, offsetUnset)
 		return;
 	}
 
-	if (zend_hash_index_del(&wmap->map, Z_OBJ_HANDLE_P(ref_zv)) == SUCCESS) {
-		wr_store_untrack(&wmap->std, Z_OBJ_P(ref_zv));
+	zend_object *obj = Z_OBJ_P(ref_zv);
+	uint32_t handle = obj->handle;
+	/* XXX this may have side effects that modify the map again? */
+	if (zend_hash_index_del(&wmap->map, handle) == SUCCESS) {
+		wr_store_untrack(&wmap->std, Z_OBJ_P(ref_zv), handle);
 	}
 
 } /* }}} */

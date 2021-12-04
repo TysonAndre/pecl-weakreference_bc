@@ -99,7 +99,7 @@ void wr_store_tracked_object_dtor(zend_object *ref_obj) /* {{{ */
 
 		do {
 			wr_ref_list *next = list_entry->next;
-			list_entry->dtor(list_entry->wref_obj, ref_obj);
+			list_entry->dtor(list_entry->wref_obj, ref_obj, handle_key);
 			efree(list_entry);
 			list_entry = next;
 		} while (list_entry);
@@ -123,7 +123,7 @@ void wr_store_tracked_object_dtor_soft(zend_object *ref_obj) /* {{{ */
 
 		do {
 			wr_ref_list *next = list_entry->next;
-			list_entry->dtor(list_entry->wref_obj, ref_obj);
+			list_entry->dtor(list_entry->wref_obj, ref_obj, handle_key);
 			efree(list_entry);
 			list_entry = next;
 		} while (list_entry);
@@ -168,7 +168,7 @@ void wr_store_track(zend_object *wref_obj, wr_ref_dtor dtor, zend_object *ref_ob
  * This function is called when a given weak-ref/map stops tracking the 'ref'
  * object.
  */
-void wr_store_untrack(zend_object *wref_obj, zend_object *ref_obj) /* {{{ */
+void wr_store_untrack(zend_object *wref_obj, zend_object *ref_obj, uint32_t handle) /* {{{ */
 {
 	wr_store      *store           = WR_G(store);
 
@@ -178,7 +178,7 @@ void wr_store_untrack(zend_object *wref_obj, zend_object *ref_obj) /* {{{ */
 		// See tests/weakref_007.phpt
 		return;
 	} else {
-		wr_ref_list   *cur = zend_hash_index_find_ptr(&store->objs, ref_obj->handle);
+		wr_ref_list   *cur = zend_hash_index_find_ptr(&store->objs, handle);
 		wr_ref_list   *prev  = NULL;
 
 		if (!cur) {
@@ -196,9 +196,9 @@ void wr_store_untrack(zend_object *wref_obj, zend_object *ref_obj) /* {{{ */
 		if (prev) {
 			prev->next = cur->next;
 		} else if (cur->next) {
-			zend_hash_index_update_ptr(&store->objs, ref_obj->handle, cur->next);
+			zend_hash_index_update_ptr(&store->objs, handle, cur->next);
 		} else {
-			zend_hash_index_del(&store->objs, ref_obj->handle);
+			zend_hash_index_del(&store->objs, handle);
 		}
 
 		efree(cur);

@@ -44,7 +44,7 @@ static inline wr_weakref_object* wr_weakref_fetch(zend_object *obj) {
 #define GC_ADDREF(v) (GC_REFCOUNT((v))++)
 #endif
 
-static void wr_weakref_ref_dtor(zend_object *wref_obj, zend_object *ref_obj) { /* {{{ */
+static void wr_weakref_ref_dtor(zend_object *wref_obj, zend_object *ref_obj, uint32_t handle) { /* {{{ */
 	wr_weakref_object *wref = wr_weakref_fetch(wref_obj);
 
 	wref->valid = 0;
@@ -56,7 +56,7 @@ static void wr_weakref_object_free_storage(zend_object *wref_obj) /* {{{ */
 	wr_weakref_object *wref     = wr_weakref_fetch(wref_obj);
 
 	if (wref->valid) {
-		wr_store_untrack(wref_obj, wref->ref_obj);
+		wr_store_untrack(wref_obj, wref->ref_obj, wref->ref_obj->handle);
 	}
 
 	zend_object_std_dtor(&wref->std);

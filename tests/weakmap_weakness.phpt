@@ -75,6 +75,7 @@ object(WeakMap)#1 (0) {
 }
 
 Destroying map with live object:
+Dtor!
 object(stdClass)#2 (0) {
 }
 
@@ -85,10 +86,9 @@ object(WeakMap)#1 (0) {
 }
 
 Storing object as own value:
-object(WeakMap)#4 (0) {
+object(WeakMap)#3 (0) {
 }
 
 Storing map in itself:
-object(WeakMap)#4 (0) {
+object(WeakMap)#3 (0) {
 }
-Dtor!
