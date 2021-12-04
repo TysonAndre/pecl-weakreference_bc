@@ -27,5 +27,5 @@ echo "OK\n";
 --EXPECT--
 Storing...
 Unsetting...
-Destroying RefHolder
 OK
+Destroying RefHolder

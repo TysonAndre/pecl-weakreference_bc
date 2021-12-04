@@ -44,12 +44,12 @@ typedef struct _wr_store_data {
 
 typedef struct _wr_store {
 	HashTable objs;
-	HashTable replacement_handlers;
-	HashTable old_handlers;
 } wr_store;
 
-void wr_store_init(TSRMLS_D);
-void wr_store_destroy(TSRMLS_D);
+void wr_store_init();
+void wr_store_destroy();
+void wr_store_minit();
+void wr_store_mdestroy();
 void wr_store_tracked_object_dtor(zend_object *ref_obj);
 void wr_store_track(zend_object *wref_obj, wr_ref_dtor dtor, zend_object *ref_obj);
 void wr_store_untrack(zend_object *wref_obj, zend_object *ref_obj);

@@ -38,10 +38,18 @@ zend_weakreference_bc_globals weakreference_bc_globals;
 
 PHP_MINIT_FUNCTION(weakreference_bc) /* {{{ */
 {
+	wr_store_minit();
 #if PHP_VERSION_ID < 70400
 	PHP_MINIT(wr_weakref)(INIT_FUNC_ARGS_PASSTHRU);
 #endif
 	PHP_MINIT(wr_weakmap)(INIT_FUNC_ARGS_PASSTHRU);
+	return SUCCESS;
+}
+/* }}} */
+
+PHP_MSHUTDOWN_FUNCTION(weakreference_bc) /* {{{ */
+{
+	wr_store_mdestroy();
 	return SUCCESS;
 }
 /* }}} */
@@ -81,7 +89,7 @@ zend_module_entry weakreference_bc_module_entry = { /* {{{ */
 	"weakreference_bc",
 	NULL,
 	PHP_MINIT(weakreference_bc),
-	NULL,
+	PHP_MSHUTDOWN(weakreference_bc),
 	PHP_RINIT(weakreference_bc),
 	PHP_RSHUTDOWN(weakreference_bc),
 	PHP_MINFO(weakreference_bc),

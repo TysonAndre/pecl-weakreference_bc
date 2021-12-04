@@ -28,21 +28,27 @@
 #include "wr_weakref.h"
 #include "php_weakref.h"
 
+void wr_store_tracked_object_dtor_soft(zend_object *ref_obj);
+
 void wr_store_init() /* {{{ */
 {
 	wr_store *store = emalloc(sizeof(wr_store));
 
-	zend_hash_init(&store->old_handlers, 0, NULL, NULL, 0);
-	zend_hash_init(&store->replacement_handlers, 0, NULL, NULL, 0);
 	zend_hash_init(&store->objs, 0, NULL, NULL, 0);
 
 	WR_G(store) = store;
 } /* }}} */
 
+void wr_store_minit() /* {{{ */
+{
+	/* Allocate persistent hashes to outlive request data. */
+	zend_hash_init(&WR_G(old_handlers), 0, NULL, NULL, 1);
+	zend_hash_init(&WR_G(replacement_handlers), 0, NULL, NULL, 1);
+} /* }}} */
+
 void wr_store_destroy() /* {{{ */
 {
 	wr_store *store = WR_G(store);
-	zend_object_handlers *handlers;
 
 	uint32_t handle;
 	ZEND_HASH_FOREACH_NUM_KEY(&store->objs, handle) {
@@ -50,18 +56,13 @@ void wr_store_destroy() /* {{{ */
 		if (!obj) {
 			continue;
 		}
-		const zend_object_handlers *orig_handlers = zend_hash_index_find_ptr(&store->replacement_handlers, (ulong)obj->handlers);
+		const zend_object_handlers *orig_handlers = zend_hash_index_find_ptr(&WR_G(replacement_handlers), (ulong)obj->handlers);
 		if (orig_handlers) {
+			wr_store_tracked_object_dtor_soft(obj);
 			obj->handlers = orig_handlers;
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	ZEND_HASH_FOREACH_PTR(&store->replacement_handlers, handlers) {
-		efree(handlers);
-	} ZEND_HASH_FOREACH_END();
-
-	zend_hash_destroy(&store->old_handlers);
-	zend_hash_destroy(&store->replacement_handlers);
 	zend_hash_destroy(&store->objs);
 
 	efree(store);
@@ -69,18 +70,52 @@ void wr_store_destroy() /* {{{ */
 	WR_G(store) = NULL;
 } /* }}} */
 
+void wr_store_mdestroy() /* {{{ */
+{
+	zend_object_handlers *handlers;
+	ZEND_HASH_FOREACH_PTR(&WR_G(replacement_handlers), handlers) {
+		free(handlers);
+	} ZEND_HASH_FOREACH_END();
+	zend_hash_destroy(&WR_G(old_handlers));
+	zend_hash_destroy(&WR_G(replacement_handlers));
+} /* }}} */
+
 /* This function is invoked whenever an object tracked by a weak ref/map is
  * destroyed */
 void wr_store_tracked_object_dtor(zend_object *ref_obj) /* {{{ */
 {
 	wr_store                  *store      = WR_G(store);
-	zend_object_handlers      *orig_handlers  = zend_hash_index_find_ptr(&store->old_handlers, (ulong)ref_obj->handlers);
+	zend_object_handlers      *orig_handlers  = zend_hash_index_find_ptr(&WR_G(old_handlers), (ulong)ref_obj->handlers);
 	zend_object_dtor_obj_t     orig_dtor  = orig_handlers->dtor_obj;
 	ulong                      handle_key = ref_obj->handle;
 	wr_ref_list               *list_entry;
 
 	/* Original dtor has been called, we invalidate the necessary weakrefs: */
 	orig_dtor(ref_obj);
+
+	if ((list_entry = zend_hash_index_find_ptr(&store->objs, handle_key)) != NULL) {
+		/* Invalidate wrefs_head while dtoring, to prevent detach on same wr */
+		zend_hash_index_del(&store->objs, handle_key);
+
+		do {
+			wr_ref_list *next = list_entry->next;
+			list_entry->dtor(list_entry->wref_obj, ref_obj);
+			efree(list_entry);
+			list_entry = next;
+		} while (list_entry);
+	}
+}
+/* }}} */
+
+/* This function is invoked whenever an object tracked by a weak ref/map is
+ * destroyed */
+void wr_store_tracked_object_dtor_soft(zend_object *ref_obj) /* {{{ */
+{
+	wr_store                  *store      = WR_G(store);
+	ulong                      handle_key = ref_obj->handle;
+	wr_ref_list               *list_entry;
+
+	/* Original dtor has been called, we invalidate the necessary weakrefs: */
 
 	if ((list_entry = zend_hash_index_find_ptr(&store->objs, handle_key)) != NULL) {
 		/* Invalidate wrefs_head while dtoring, to prevent detach on same wr */
@@ -107,12 +142,12 @@ void wr_store_track(zend_object *wref_obj, wr_ref_dtor dtor, zend_object *ref_ob
 	ulong     handlers_key = (ulong)orig_handlers;
 	ulong     handle_key   = ref_obj->handle;
 
-	if (orig_handlers->dtor_obj != wr_store_tracked_object_dtor && zend_hash_index_find_ptr(&store->replacement_handlers, handlers_key) == NULL) {
-		zend_object_handlers *new_handlers = emalloc(sizeof(zend_object_handlers));
+	if (orig_handlers->dtor_obj != wr_store_tracked_object_dtor && zend_hash_index_find_ptr(&WR_G(replacement_handlers), handlers_key) == NULL) {
+		zend_object_handlers *new_handlers = malloc(sizeof(zend_object_handlers));
 		*new_handlers = *orig_handlers;
 		new_handlers->dtor_obj = wr_store_tracked_object_dtor;
-		zend_hash_index_update_ptr(&store->replacement_handlers, handlers_key, new_handlers);
-		zend_hash_index_update_ptr(&store->old_handlers, (zend_long)new_handlers, (zend_object_handlers *)orig_handlers);
+		zend_hash_index_update_ptr(&WR_G(replacement_handlers), handlers_key, new_handlers);
+		zend_hash_index_update_ptr(&WR_G(old_handlers), (zend_long)new_handlers, (zend_object_handlers *)orig_handlers);
 		ref_obj->handlers = new_handlers;
 	}
 

@@ -49,6 +49,8 @@ PHP_RSHUTDOWN_FUNCTION(weakreference_bc);
 
 ZEND_BEGIN_MODULE_GLOBALS(weakreference_bc)
     wr_store *store;
+	HashTable replacement_handlers;
+	HashTable old_handlers;
 ZEND_END_MODULE_GLOBALS(weakreference_bc)
 
 #ifdef ZTS

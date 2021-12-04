@@ -63,22 +63,13 @@ unset($map);
 --EXPECT--
 object(WeakMap)#1 (0) {
 }
-object(WeakMap)#1 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#2 (0) {
-    }
-    ["value"]=>
-    int(2)
-  }
+object(WeakMap)#1 (0) {
 }
 object(WeakMap)#1 (0) {
 }
 
 Destructor in WeakMap value:
 Before unset:
-Dtor!
 After unset:
 object(WeakMap)#1 (0) {
 }
@@ -88,41 +79,16 @@ object(stdClass)#2 (0) {
 }
 
 Object freed by GC:
-object(WeakMap)#1 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#3 (1) {
-      ["obj"]=>
-      *RECURSION*
-    }
-    ["value"]=>
-    int(4)
-  }
+object(WeakMap)#1 (0) {
 }
 object(WeakMap)#1 (0) {
 }
 
 Storing object as own value:
-object(WeakMap)#3 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#1 (0) {
-    }
-    ["value"]=>
-    object(stdClass)#1 (0) {
-    }
-  }
+object(WeakMap)#4 (0) {
 }
 
 Storing map in itself:
-object(WeakMap)#3 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    *RECURSION*
-    ["value"]=>
-    *RECURSION*
-  }
+object(WeakMap)#4 (0) {
 }
+Dtor!

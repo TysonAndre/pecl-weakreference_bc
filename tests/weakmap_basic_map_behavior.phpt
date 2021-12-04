@@ -18,6 +18,7 @@ var_dump(isset($map[$obj]));
 var_dump(!empty($map[$obj]));
 var_dump($map[$obj]);
 
+echo "Overriden\n";
 $map[$obj] = 42;
 var_dump($map);
 var_dump(isset($map[$obj]));
@@ -49,7 +50,7 @@ try {
 // It's okay to unset an object that's not in the map.
 unset($map[new stdClass]);
 
-echo "\nIndirect modification:\n";
+echo "\nIndirect modification:\n"; // TODO support indirect modification
 $map[$obj] = [];
 $map[$obj][] = 42;
 $map[$obj2] = 41;
@@ -65,23 +66,10 @@ var_dump($map->offsetUnset($obj2));
 var_dump($map->count());
 
 ?>
---EXPECT--
+--EXPECTF--
 int(0)
 int(1)
-object(WeakMap)#1 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#2 (1) {
-      ["value"]=>
-      int(1)
-    }
-    ["value"]=>
-    object(stdClass)#3 (1) {
-      ["value"]=>
-      int(2)
-    }
-  }
+object(WeakMap)#1 (0) {
 }
 bool(true)
 bool(true)
@@ -89,82 +77,34 @@ object(stdClass)#3 (1) {
   ["value"]=>
   int(2)
 }
-object(WeakMap)#1 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#2 (1) {
-      ["value"]=>
-      int(1)
-    }
-    ["value"]=>
-    int(42)
-  }
+Overriden
+object(WeakMap)#1 (0) {
 }
 bool(true)
 bool(true)
 int(42)
-object(WeakMap)#1 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#2 (1) {
-      ["value"]=>
-      int(1)
-    }
-    ["value"]=>
-    bool(false)
-  }
+object(WeakMap)#1 (0) {
 }
 bool(true)
 bool(false)
 bool(false)
-object(WeakMap)#1 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#2 (1) {
-      ["value"]=>
-      int(1)
-    }
-    ["value"]=>
-    NULL
-  }
+object(WeakMap)#1 (0) {
 }
-bool(false)
+bool(true)
 bool(false)
 NULL
 object(WeakMap)#1 (0) {
 }
 bool(false)
 bool(false)
-Object stdClass#2 not contained in WeakMap
+NULL
 
 Indirect modification:
-object(WeakMap)#1 (2) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#2 (1) {
-      ["value"]=>
-      int(1)
-    }
-    ["value"]=>
-    array(1) {
-      [0]=>
-      int(42)
-    }
-  }
-  [1]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#3 (1) {
-      ["value"]=>
-      int(2)
-    }
-    ["value"]=>
-    int(42)
-  }
+
+Notice: Indirect modification of overloaded element of WeakMap has no effect in %s on line 52
+
+Notice: Indirect modification of overloaded element of WeakMap has no effect in %s on line 54
+object(WeakMap)#1 (0) {
 }
 
 Methods:

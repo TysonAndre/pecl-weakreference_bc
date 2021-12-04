@@ -35,35 +35,11 @@ unset($obj);
 bool(true)
 object(stdClass)#1 (0) {
 }
-object(WeakMap)#3 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#1 (0) {
-    }
-    ["value"]=>
-    int(1)
-  }
+object(WeakMap)#3 (0) {
 }
-object(WeakMap)#4 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#1 (0) {
-    }
-    ["value"]=>
-    int(1)
-  }
+object(WeakMap)#4 (0) {
 }
-object(WeakMap)#5 (1) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#1 (0) {
-    }
-    ["value"]=>
-    int(1)
-  }
+object(WeakMap)#5 (0) {
 }
 NULL
 object(WeakMap)#3 (0) {

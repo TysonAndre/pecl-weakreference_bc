@@ -1,5 +1,7 @@
 --TEST--
 WeakReference serials
+--SKIPIF--
+<?php if (PHP_VERSION_ID >= 70400) echo "skip WeakReference not provided by this PECL\n"; ?>
 --FILE--
 <?php
 $wr = WeakReference::create(new stdClass);

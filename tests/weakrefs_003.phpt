@@ -4,9 +4,21 @@ WeakReference object handlers
 <?php
 $wr = WeakReference::create(new stdClass);
 
-var_dump($wr->disallow);
-var_dump(isset($wr->disallow));
-unset($wr->disallow);
+try {
+    var_dump($wr->disallow);
+} catch (Error $ex) {
+    var_dump($ex->getMessage());
+}
+try {
+    var_dump(isset($wr->disallow));
+} catch (Error $ex) {
+    var_dump($ex->getMessage());
+}
+try {
+    unset($wr->disallow);
+} catch (Error $ex) {
+    var_dump($ex->getMessage());
+}
 
 try {
     $wr->disallow = "writes";
@@ -21,8 +33,8 @@ try {
 }
 ?>
 --EXPECTF--
-Warning: Undefined property: WeakReference::$disallow in %s on line %d
-NULL
-bool(false)
-string(55) "Cannot create dynamic property WeakReference::$disallow"
-string(57) "Cannot create dynamic property WeakReference::$disallowed"
+string(47) "WeakReference objects do not support properties"
+string(47) "WeakReference objects do not support properties"
+string(47) "WeakReference objects do not support properties"
+string(47) "WeakReference objects do not support properties"
+string(56) "WeakReference objects do not support property references"

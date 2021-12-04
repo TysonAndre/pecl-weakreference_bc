@@ -28,10 +28,13 @@ foreach ($map as $key => $value) {
 }
 
 echo "\nBy reference iteration:\n";
-foreach ($map as $key => &$value) {
-    $value++;
+try {
+	foreach ($map as $key => &$value) {
+	}
+} catch (Error $e) {
+	// TODO support compatibility with PHP 8.0's WeakMap
+	var_dump($e->getMessage());
 }
-var_dump($map);
 
 ?>
 --EXPECT--
@@ -60,21 +63,4 @@ object(stdClass)#4 (0) {
 int(2)
 
 By reference iteration:
-object(WeakMap)#1 (2) {
-  [0]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#2 (0) {
-    }
-    ["value"]=>
-    &int(1)
-  }
-  [1]=>
-  array(2) {
-    ["key"]=>
-    object(stdClass)#4 (0) {
-    }
-    ["value"]=>
-    &int(3)
-  }
-}
+string(52) "An iterator cannot be used with foreach by reference"

@@ -65,6 +65,7 @@ static void wr_weakmap_object_free_storage(zend_object *wmap_obj) /* {{{ */
 
 static void wr_weakmap_refval_dtor(zval *data) /* {{{ */
 {
+	ZEND_ASSERT(Z_TYPE_P(data) == IS_PTR);
 	wr_weakmap_refval *refval = Z_PTR_P(data);
 	zval_ptr_dtor(&refval->val);
 
@@ -183,22 +184,35 @@ PHP_METHOD(WeakMap, offsetSet)
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "oz", &ref_zv, &val_zv) == FAILURE) {
 		return;
 	}
+	zend_object *obj_key = Z_OBJ_P(ref_zv);
+	uint32_t obj_handle = obj_key->handle;
 
-	if (!zend_hash_index_exists(&wmap->map, Z_OBJ_HANDLE_P(ref_zv))) {
+	if (!zend_hash_index_exists(&wmap->map, obj_handle)) {
 		// Object not already in the weakmap, we attach it
-		wr_store_track(&wmap->std, wr_weakmap_ref_dtor, Z_OBJ_P(ref_zv));
+		wr_store_track(&wmap->std, wr_weakmap_ref_dtor, obj_key);
 	}
 
 	Z_TRY_ADDREF_P(val_zv);
 
+	zval *zv = zend_hash_index_find(&wmap->map, obj_handle);
+	if (zv) {
+		ZEND_ASSERT(Z_TYPE_P(zv) == IS_PTR);
+		wr_weakmap_refval *refval = Z_PTR_P(zv);
+		ZEND_ASSERT(refval->ref == obj_key);
+		/* Because the destructors can have side effects such as resizing or rehashing the WeakMap storage,
+		 * free the zval only after overwriting the original value. */
+		zval zv_orig;
+		ZVAL_COPY_VALUE(&zv_orig, &refval->val);
+		ZVAL_COPY(&refval->val, val_zv);
+		zval_ptr_dtor(&zv_orig);
+		return;
+	}
+
 	wr_weakmap_refval *refval = emalloc(sizeof(wr_weakmap_refval));
 
-	refval->ref = Z_OBJ_P(ref_zv);
+	refval->ref = obj_key;
 	ZVAL_COPY_VALUE(&refval->val, val_zv);
-
-	zend_hash_index_update_ptr(&wmap->map, Z_OBJ_HANDLE_P(ref_zv), refval);
-
-
+	zend_hash_index_update_ptr(&wmap->map, obj_handle, refval);
 } /* }}} */
 
 /* {{{ proto void WeakMap::offsetUnset(mixed $index) U

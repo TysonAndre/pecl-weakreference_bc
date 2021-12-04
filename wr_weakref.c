@@ -113,8 +113,24 @@ PHP_METHOD(WeakReference, get)
 ZEND_COLD PHP_METHOD(WeakReference, __construct)
 {
 	zend_throw_error(NULL,
-	    "Direct instantiation of 'WeakReference' is not allowed, "
+	    "Direct instantiation of WeakReference is not allowed, "
 	    "use WeakReference::create instead");
+}
+/* }}} */
+
+/* {{{ proto noreturn WeakReference::__wakeup()
+*/
+ZEND_COLD PHP_METHOD(WeakReference, __wakeup)
+{
+	zend_throw_exception(NULL, "Unserialization of 'WeakReference' is not allowed", 0);
+}
+/* }}} */
+
+/* {{{ proto noreturn WeakReference::__sleep()
+*/
+ZEND_COLD PHP_METHOD(WeakReference, __sleep)
+{
+	zend_throw_exception(NULL, "Serialization of 'WeakReference' is not allowed", 0);
 }
 /* }}} */
 
@@ -150,6 +166,39 @@ PHP_METHOD(WeakReference, create)
 }
 /* }}} */
 
+#define weakref_unsupported(thing) \
+	zend_throw_error(NULL, "WeakReference objects do not support " thing);
+
+static ZEND_COLD zval* wr_weakref_no_write(zval *object, zval *member, zval *value, void **rtc) {
+	weakref_unsupported("properties");
+
+	return &EG(uninitialized_zval);
+}
+
+static ZEND_COLD zval* wr_weakref_no_read(zval *object, zval *member, int type, void **rtc, zval *rv) {
+	if (!EG(exception)) {
+		weakref_unsupported("properties");
+	}
+
+	return &EG(uninitialized_zval);
+}
+
+static ZEND_COLD zval *wr_weakref_no_read_ptr(zval *object, zval *member, int type, void **rtc) {
+	weakref_unsupported("property references");
+	return NULL;
+}
+
+static ZEND_COLD int wr_weakref_no_isset(zval *object, zval *member, int hse, void **rtc) {
+	if (hse != 2) {
+		weakref_unsupported("properties");
+	}
+	return 0;
+}
+
+static ZEND_COLD void wr_weakref_no_unset(zval *object, zval *member, void **rtc) {
+	weakref_unsupported("properties");
+}
+
 /*  Function/Class/Method definitions */
 ZEND_BEGIN_ARG_INFO(arginfo_wr_weakref_void, 0)
 ZEND_END_ARG_INFO()
@@ -162,6 +211,8 @@ static const zend_function_entry wr_funcsWeakReference[] = {
 	PHP_ME(WeakReference, __construct,     arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
 	PHP_ME(WeakReference, create,          arginfo_wr_weakref_obj,             ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(WeakReference, get,             arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
+	PHP_ME(WeakReference, __sleep,         arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
+	PHP_ME(WeakReference, __wakeup,        arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 /* }}} */
@@ -179,6 +230,11 @@ PHP_MINIT_FUNCTION(wr_weakref) /* {{{ */
 
 	memcpy(&wr_handlerWeakReference, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 
+	wr_handlerWeakReference.read_property = wr_weakref_no_read;
+	wr_handlerWeakReference.write_property = wr_weakref_no_write;
+	wr_handlerWeakReference.has_property = wr_weakref_no_isset;
+	wr_handlerWeakReference.unset_property = wr_weakref_no_unset;
+	wr_handlerWeakReference.get_property_ptr_ptr = wr_weakref_no_read_ptr;
 	wr_handlerWeakReference.clone_obj = NULL;
 	wr_handlerWeakReference.free_obj  = wr_weakref_object_free_storage;
 	wr_handlerWeakReference.offset    = XtOffsetOf(wr_weakref_object, std);

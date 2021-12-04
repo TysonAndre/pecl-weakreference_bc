@@ -2,7 +2,7 @@
 WeakMap error conditions
 --FILE--
 <?php
-
+// TODO: Update std handlers and make these throw
 $map = new WeakMap;
 try {
     $map[1] = 2;
@@ -74,19 +74,26 @@ try {
 
 ?>
 --EXPECTF--
-WeakMap key must be an object
-WeakMap key must be an object
-WeakMap key must be an object
-WeakMap key must be an object
-Cannot append to WeakMap
-Cannot append to WeakMap
-Object stdClass#2 not contained in WeakMap
+Warning: WeakMap::offsetSet() expects parameter 1 to be object, int%S given in %s on line 5
 
-Warning: Undefined property: WeakMap::$prop in %s on line %d
+Warning: WeakMap::offsetGet() expects parameter 1 to be object, int%S given in %s on line 10
+NULL
+
+Warning: WeakMap::offsetExists() expects parameter 1 to be object, int%S given in %s on line 15
+
+Warning: WeakMap::offsetUnset() expects parameter 1 to be object, int%S given in %s on line 20
+
+Warning: WeakMap::offsetSet() expects parameter 1 to be object, null given in %s on line 26
+
+Warning: WeakMap::offsetGet() expects parameter 1 to be object, null given in %s on line 31
+
+Notice: Indirect modification of overloaded element of WeakMap has no effect in %s on line 31
+NULL
+
+Notice: Undefined property: WeakMap::$prop in %s on line 41
 NULL
 bool(false)
-Cannot create dynamic property WeakMap::$prop
-Cannot create dynamic property WeakMap::$prop
-Cannot create dynamic property WeakMap::$prop
-Serialization of 'WeakMap' is not allowed
-Unserialization of 'WeakMap' is not allowed
+
+Warning: Cannot use a scalar value as an array in %s on line 51
+
+Warning: Class WeakMap has no unserializer in %s on line 67

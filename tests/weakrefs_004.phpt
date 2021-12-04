@@ -5,4 +5,4 @@ WeakReference no inheritance
 class Test extends WeakReference {}
 ?>
 --EXPECTF--
-Fatal error: Class Test cannot extend final class WeakReference in %s on line %d
+Fatal error: Class Test %s final class %SWeakReference%S in %s on line %d
