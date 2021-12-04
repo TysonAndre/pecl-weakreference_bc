@@ -1,5 +1,5 @@
 --TEST--
-Weakref: usage
+Weakref: usage #69131: During shutdown, acquired refs can be dtored before the wref
 --FILE--
 <?php
 $wr = [];
@@ -8,7 +8,6 @@ for($i = 0; $i < 2; $i++) {
     $wr[$i] = new Weakref($c);
     $wr[$i]->acquire();
 }
-unset($wr[0]);
 ?>
 ==END==
 --EXPECTF--
