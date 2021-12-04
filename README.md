@@ -1,5 +1,7 @@
 # The weakreference_bc PECL extension
 
+[![Build Status](https://github.com/TysonAndre/pecl-weakreference_bc/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/TysonAndre/pecl-weakreference_bc/actions/workflows/main.yml?query=branch%3Amaster)
+
 **[weakreference_bc](https://github.com/TysonAndre/pecl-weakreference_bc) is a fork of the unmaintained https://pecl.php.net/weakref PECL. The `weakreference_bc` PECL changes the API to provide polyfills for [WeakReference](https://www.php.net/manual/en/class.weakreference.php)/[WeakMap](https://www.php.net/manual/en/class.weakmap.php)**
 
 A weak reference provides a gateway to an object without preventing that object
@@ -46,8 +48,8 @@ if (is_object($r1->get())) { // It doesn't have a reference
 ?>
 ```
 
-## Weakmap
-The Weakmap class is very similar to WeakReference, only that it also allows to
+## WeakMap
+The WeakMap class is very similar to WeakReference, only that it also allows to
 associate data to each object. When the target object gets destroyed, the
 associated data is automatically freed.
 
