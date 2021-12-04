@@ -31,40 +31,42 @@
 #include "php_weakref.h"
 
 #ifdef ZTS
-int weakref_globals_id;
+int weakreference_bc_globals_id;
 #else
-zend_weakref_globals weakref_globals;
+zend_weakreference_bc_globals weakreference_bc_globals;
 #endif
 
-PHP_MINIT_FUNCTION(weakref) /* {{{ */
+PHP_MINIT_FUNCTION(weakreference_bc) /* {{{ */
 {
+#if PHP_VERSION_ID < 70400
 	PHP_MINIT(wr_weakref)(INIT_FUNC_ARGS_PASSTHRU);
+#endif
 	PHP_MINIT(wr_weakmap)(INIT_FUNC_ARGS_PASSTHRU);
 	return SUCCESS;
 }
 /* }}} */
 
-PHP_RINIT_FUNCTION(weakref) /* {{{ */
+PHP_RINIT_FUNCTION(weakreference_bc) /* {{{ */
 {
 	wr_store_init(TSRMLS_C);
 	return SUCCESS;
 }
 /* }}} */
 
-PHP_RSHUTDOWN_FUNCTION(weakref) /* {{{ */
+PHP_RSHUTDOWN_FUNCTION(weakreference_bc) /* {{{ */
 {
 	wr_store_destroy(TSRMLS_C);
 	return SUCCESS;
 }
 /* }}} */
 
-static PHP_GINIT_FUNCTION(weakref) /* {{{ */
+static PHP_GINIT_FUNCTION(weakreference_bc) /* {{{ */
 {
-	weakref_globals->store = NULL;
+	weakreference_bc_globals->store = NULL;
 }
 /* }}} */
 
-PHP_MINFO_FUNCTION(weakref) /* {{{ */
+PHP_MINFO_FUNCTION(weakreference_bc) /* {{{ */
 {
 	php_info_print_table_start();
 	php_info_print_table_header(2, "Weak References support", "enabled");
@@ -73,27 +75,27 @@ PHP_MINFO_FUNCTION(weakref) /* {{{ */
 }
 /* }}} */
 
-zend_module_entry weakref_module_entry = { /* {{{ */
+zend_module_entry weakreference_bc_module_entry = { /* {{{ */
 	STANDARD_MODULE_HEADER_EX, NULL,
 	NULL,
-	"Weakref",
+	"weakreference_bc",
 	NULL,
-	PHP_MINIT(weakref),
+	PHP_MINIT(weakreference_bc),
 	NULL,
-	PHP_RINIT(weakref),
-	PHP_RSHUTDOWN(weakref),
-	PHP_MINFO(weakref),
+	PHP_RINIT(weakreference_bc),
+	PHP_RSHUTDOWN(weakreference_bc),
+	PHP_MINFO(weakreference_bc),
 	PHP_WEAKREF_VERSION,
-	PHP_MODULE_GLOBALS(weakref),
-	PHP_GINIT(weakref),
+	PHP_MODULE_GLOBALS(weakreference_bc),
+	PHP_GINIT(weakreference_bc),
 	NULL,
 	NULL,
 	STANDARD_MODULE_PROPERTIES_EX
 };
 /* }}} */
 
-#ifdef COMPILE_DL_WEAKREF
-ZEND_GET_MODULE(weakref);
+#ifdef COMPILE_DL_WEAKREFERENCE_BC
+ZEND_GET_MODULE(weakreference_bc);
 #endif
 
 /*

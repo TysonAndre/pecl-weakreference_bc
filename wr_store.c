@@ -42,7 +42,6 @@ void wr_store_init() /* {{{ */
 void wr_store_destroy() /* {{{ */
 {
 	wr_store *store = WR_G(store);
-	zend_object_dtor_obj_t     orig_dtor;
 	zend_object_handlers *handlers;
 
 	uint32_t handle;

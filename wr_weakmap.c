@@ -236,11 +236,11 @@ PHP_METHOD(WeakMap, rewind)
 PHP_METHOD(WeakMap, valid)
 {
 	wr_weakmap_object *wmap = Z_WEAKMAP_OBJ_P(getThis());
-	
+
 	if (zend_parse_parameters_none() == FAILURE) {
 		return;
 	}
-	
+
 	RETURN_BOOL(zend_hash_has_more_elements_ex(&wmap->map, &wmap->pos) == SUCCESS);
 } /* }}} */
 
@@ -268,7 +268,7 @@ PHP_METHOD(WeakMap, key)
 PHP_METHOD(WeakMap, current)
 {
 	wr_weakmap_object *wmap = Z_WEAKMAP_OBJ_P(getThis());
-	
+
 	if (zend_parse_parameters_none() == FAILURE) {
 		return;
 	}
@@ -288,11 +288,11 @@ PHP_METHOD(WeakMap, current)
 PHP_METHOD(WeakMap, next)
 {
 	wr_weakmap_object *wmap = Z_WEAKMAP_OBJ_P(getThis());
-	
+
 	if (zend_parse_parameters_none() == FAILURE) {
 		return;
 	}
-	
+
 	zend_hash_move_forward_ex(&wmap->map, &wmap->pos);
 } /* }}} */
 
@@ -323,7 +323,7 @@ static const zend_function_entry wr_funcs_WeakMap[] = {
 	PHP_ME(WeakMap,  key,            arginfo_wr_weakmap_void,      ZEND_ACC_PUBLIC)
 	PHP_ME(WeakMap,  current,        arginfo_wr_weakmap_void,      ZEND_ACC_PUBLIC)
 	PHP_ME(WeakMap,  next,           arginfo_wr_weakmap_void,      ZEND_ACC_PUBLIC)
-	{NULL, NULL, NULL}
+	PHP_FE_END
 };
 /* }}} */
 

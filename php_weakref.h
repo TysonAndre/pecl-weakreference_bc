@@ -23,7 +23,7 @@
 
 #include <php.h>
 
-#define PHP_WEAKREF_VERSION "0.3.3"
+#define PHP_WEAKREF_VERSION "0.4.0"
 
 #ifdef PHP_WIN32
 #define WEAKREF_API __declspec(dllexport)
@@ -38,25 +38,25 @@
 #include "wr_weakref.h"
 #include "wr_store.h"
 
-extern zend_module_entry weakref_module_entry;
-#define phpext_weakref_ptr &weakref_module_entry
+extern zend_module_entry weakreference_bc_module_entry;
+#define phpext_weakreference_bc_ptr &weakreference_bc_module_entry
 
-PHP_MINFO_FUNCTION(weakref);
+PHP_MINFO_FUNCTION(weakreference_bc);
 
-PHP_MINIT_FUNCTION(weakref);
-PHP_RINIT_FUNCTION(weakref);
-PHP_RSHUTDOWN_FUNCTION(weakref);
+PHP_MINIT_FUNCTION(weakreference_bc);
+PHP_RINIT_FUNCTION(weakreference_bc);
+PHP_RSHUTDOWN_FUNCTION(weakreference_bc);
 
-ZEND_BEGIN_MODULE_GLOBALS(weakref)
+ZEND_BEGIN_MODULE_GLOBALS(weakreference_bc)
     wr_store *store;
-ZEND_END_MODULE_GLOBALS(weakref)
+ZEND_END_MODULE_GLOBALS(weakreference_bc)
 
 #ifdef ZTS
-#define WR_G(v) TSRMG(weakref_globals_id, zend_weakref_globals *, v)
-extern int weakref_globals_id;
+#define WR_G(v) TSRMG(weakreference_bc_globals_id, zend_weakreference_bc_globals *, v)
+extern int weakreference_bc_globals_id;
 #else
-#define WR_G(v) (weakref_globals.v)
-extern zend_weakref_globals weakref_globals;
+#define WR_G(v) (weakreference_bc_globals.v)
+extern zend_weakreference_bc_globals weakreference_bc_globals;
 #endif
 
 #endif /* PHP_WEAKREF_H */

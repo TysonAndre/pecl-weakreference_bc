@@ -82,17 +82,6 @@ static zend_object* wr_weakref_object_new_ex(zend_class_entry *ce, zend_object *
 }
 /* }}} */
 
-static zend_object* wr_weakref_object_clone(zval *cloneOf_zv) /* {{{ */
-{
-	zend_object *cloneOf = Z_OBJ_P(cloneOf_zv);
-	zend_object *clone = wr_weakref_object_new_ex(cloneOf->ce, cloneOf);
-
-	zend_objects_clone_members(clone, Z_OBJ_P(cloneOf_zv));
-
-	return clone;
-}
-/* }}} */
-
 static zend_object* wr_weakref_object_new(zend_class_entry *ce) /* {{{ */
 {
 	return wr_weakref_object_new_ex(ce, NULL);

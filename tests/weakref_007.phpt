@@ -18,7 +18,7 @@ Weakref: Destroying the weakref and its object after a fatal error
 
 		function __destruct() {
 			printf("Destroy B\n");
-			var_dump($this->ref->valid());
+			var_dump(is_object($this->ref->get()));
 		}
 	}
 	function doit() {
