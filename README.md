@@ -1,6 +1,6 @@
 # The weakreference_bc PECL extension
 
-**This is a fork of the unmaintained https://pecl.php.net/weakref PECL. The `weakreference_bc` PECL changes the API to provide polyfills for [WeakReference](https://www.php.net/manual/en/class.weakreference.php)/[WeakMap](https://www.php.net/manual/en/class.weakmap.php)**
+**[weakreference_bc](https://github.com/TysonAndre/pecl-weakreference_bc) is a fork of the unmaintained https://pecl.php.net/weakref PECL. The `weakreference_bc` PECL changes the API to provide polyfills for [WeakReference](https://www.php.net/manual/en/class.weakreference.php)/[WeakMap](https://www.php.net/manual/en/class.weakmap.php)**
 
 A weak reference provides a gateway to an object without preventing that object
 from being collected by the garbage collector (GC). It allows to associate

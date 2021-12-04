@@ -5,7 +5,7 @@ http://pear.php.net/dtd/package-2.0
 http://pear.php.net/dtd/package-2.0.xsd">
  <name>weakreference_bc</name>
  <channel>pecl.php.net</channel>
- <summary>Polyfill of WeakMap/WeakReference for older versions. This is a fork of the abandoned "weakref" PECL.</summary>
+ <summary>Polyfill of WeakMap/WeakReference for older PHP versions. This is a fork of the abandoned "weakref" PECL.</summary>
  <description>
   A weak reference provides a gateway to an object without preventing that object from being collected by the garbage collector (GC).
  </description>
