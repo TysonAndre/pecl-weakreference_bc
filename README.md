@@ -1,6 +1,6 @@
 # The weakreference_bc PECL extension (name TBD)
 
-**This is a fork of https://pecl.php.net/weakref that provides polyfills for WeakReference/WeakMap**
+**This is a fork of the unmaintained https://pecl.php.net/weakref that changes the API to provide polyfills for WeakReference/WeakMap**
 
 A weak reference provides a gateway to an object without preventing that object
 from being collected by the garbage collector (GC). It allows to associate
@@ -12,7 +12,7 @@ longer used.
 More information about releases can be found on https://pecl.php.net/weakref
 
 ## WeakReference
-The weakref class is a simple class that allows to access its referenced object
+The WeakReference class is a simple class that allows to access its referenced object
 as long as it exists. Unlike other references, having this WeakReference object will
 not prevent the object to be collected.
 

@@ -4,7 +4,7 @@ Weakref: stable spl_object_hash
 <?php
 $o = new StdClass();
 $oldHash = spl_object_hash($o);
-$wr = new WeakReference($o);
+$wr = WeakReference::create($o);
 $newHash = spl_object_hash($o);
 
 var_dump($oldHash == $newHash);

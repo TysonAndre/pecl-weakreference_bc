@@ -29,8 +29,8 @@
 #include "wr_weakref.h"
 #include "php_weakref.h"
 
-zend_object_handlers wr_handler_WeakRef;
-WEAKREF_API zend_class_entry  *wr_ce_WeakRef;
+zend_object_handlers wr_handlerWeakReference;
+WEAKREF_API zend_class_entry  *wr_ceWeakReference;
 
 static inline wr_weakref_object* wr_weakref_fetch(zend_object *obj) {
 	return (wr_weakref_object *)((char *)obj - XtOffsetOf(wr_weakref_object, std));
@@ -42,47 +42,8 @@ static inline wr_weakref_object* wr_weakref_fetch(zend_object *obj) {
 #define GC_ADDREF(v) (GC_REFCOUNT((v))++)
 #endif
 
-static int wr_weakref_ref_acquire(wr_weakref_object *wref) /* {{{ */
-{
-	if (wref->valid) {
-		if (wref->acquired == 0) {
-			// From now on we hold a proper reference
-			GC_ADDREF(wref->ref_obj);
-		}
-		wref->acquired++;
-		return SUCCESS;
-	} else {
-		return FAILURE;
-	}
-}
-/* }}} */
-
-static int wr_weakref_ref_release(wr_weakref_object *wref) /* {{{ */
-{
-	if (wref->valid && (wref->acquired > 0)) {
-		wref->acquired--;
-		if (wref->acquired == 0) {
-			// We no longer need a proper reference
-			OBJ_RELEASE(wref->ref_obj);
-		}
-		return SUCCESS;
-	} else {
-		return FAILURE;
-	}
-}
-/* }}} */
-
 static void wr_weakref_ref_dtor(zend_object *wref_obj, zend_object *ref_obj) { /* {{{ */
 	wr_weakref_object *wref = wr_weakref_fetch(wref_obj);
-
-	/* During shutdown, the ref might be dtored before the wref is released */
-	while (wref->acquired > 0) {
-		if (wr_weakref_ref_release(wref) != SUCCESS) {
-			// shouldn't occur
-			zend_throw_exception(spl_ce_RuntimeException, "Failed to correctly release the reference during shutdown", 0);
-			break;
-		}
-	}
 
 	wref->valid = 0;
 }
@@ -91,14 +52,6 @@ static void wr_weakref_ref_dtor(zend_object *wref_obj, zend_object *ref_obj) { /
 static void wr_weakref_object_free_storage(zend_object *wref_obj) /* {{{ */
 {
 	wr_weakref_object *wref     = wr_weakref_fetch(wref_obj);
-
-	while (wref->acquired > 0) {
-		if (wr_weakref_ref_release(wref) != SUCCESS) {
-			// shouldn't occur
-			zend_throw_exception(spl_ce_RuntimeException, "Failed to correctly release the reference on free", 0);
-			break;
-		}
-	}
 
 	if (wref->valid) {
 		wr_store_untrack(wref_obj, wref->ref_obj);
@@ -121,43 +74,9 @@ static zend_object* wr_weakref_object_new_ex(zend_class_entry *ce, zend_object *
 		wref->ref_obj = other->ref_obj;
 
 		wr_store_track(&wref->std, wr_weakref_ref_dtor, other->ref_obj);
-
-		while(wref->acquired < other->acquired && (wr_weakref_ref_acquire(wref) == SUCCESS)) {
-			// NOOP
-		}
 	}
-	//if (clone_orig && orig) {
-		//wr_weakref_object *other = (wr_weakref_object *)zend_object_store_get_object(orig);
-		//if (other->valid) {
-		//	int acquired = 0;
 
-		//	intern->valid = other->valid;
-		//	ALLOC_INIT_ZVAL(intern->ref);
-		//	// ZVAL_COPY_VALUE
-		//	intern->ref->value = other->ref->value;
-		//	Z_TYPE_P(intern->ref) = Z_TYPE_P(other->ref);
-
-		//	wr_store_track((zend_object *)intern, wr_weakref_ref_dtor, other->ref);
-
-		//	for (acquired = 0; acquired < other->acquired; acquired++) {
-		//		wr_weakref_ref_acquire(intern);
-		//	}
-
-		//	if (intern->acquired != other->acquired) {
-		//		// shouldn't occur
-		//		zend_throw_exception(spl_ce_RuntimeException, "Failed to correctly acquire clone's reference", 0);
-		//	}
-
-		//} else {
-		//	intern->valid    = 0;
-		//	intern->ref_obj  = NULL;
-		//	intern->acquired = 0;
-		//}
-	//} else {
-
-	//}
-
-	wref->std.handlers = &wr_handler_WeakRef;
+	wref->std.handlers = &wr_handlerWeakReference;
 
 	return &wref->std;
 }
@@ -214,21 +133,43 @@ PHP_METHOD(WeakReference, valid)
 }
 /* }}} */
 
-/* {{{ proto void WeakReference::__construct(object ref)
+/* {{{ proto noreturn WeakReference::__construct()
 */
-PHP_METHOD(WeakReference, __construct)
+ZEND_COLD PHP_METHOD(WeakReference, __construct)
+{
+	zend_throw_error(NULL,
+	    "Direct instantiation of 'WeakReference' is not allowed, "
+	    "use WeakReference::create instead");
+}
+/* }}} */
+
+/* {{{ proto void WeakReference::create(object ref)
+ */
+PHP_METHOD(WeakReference, create)
 {
 	zval *ref;
-	zend_object *wref_obj   = Z_OBJ_P(getThis());
-	wr_weakref_object *wref = wr_weakref_fetch(wref_obj);
 
 	if (FAILURE == zend_parse_parameters(ZEND_NUM_ARGS(), "o", &ref)) {
 		return;
 	}
 
-	wref->ref_obj = Z_OBJ_P(ref);
+	zend_object *ref_obj = Z_OBJ_P(ref);
+	wr_store *store = WR_G(store);
+	wr_ref_list *cur = zend_hash_index_find_ptr(&store->objs, ref_obj->handle);
+	while (cur) {
+		if (cur->wref_obj->ce == wr_ceWeakReference) {
+			GC_ADDREF(cur->wref_obj);
+			RETURN_OBJ(cur->wref_obj);
+		}
+		cur = cur->next;
+	}
+    object_init_ex(return_value, wr_ceWeakReference);
+	zend_object *wr_obj = Z_OBJ_P(return_value);
+	wr_weakref_object *wref = wr_weakref_fetch(wr_obj);
 
-	wr_store_track(wref_obj, wr_weakref_ref_dtor, Z_OBJ_P(ref));
+	wref->ref_obj = ref_obj;
+
+	wr_store_track(wr_obj, wr_weakref_ref_dtor, ref_obj);
 
 	wref->valid = 1;
 }
@@ -242,8 +183,9 @@ ZEND_BEGIN_ARG_INFO(arginfo_wr_weakref_obj, 0)
 	ZEND_ARG_INFO(0, object)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry wr_funcs_WeakRef[] = {
-	PHP_ME(WeakReference, __construct,     arginfo_wr_weakref_obj,             ZEND_ACC_PUBLIC)
+static const zend_function_entry wr_funcsWeakReference[] = {
+	PHP_ME(WeakReference, __construct,     arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
+	PHP_ME(WeakReference, create,          arginfo_wr_weakref_obj,             ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(WeakReference, valid,           arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
 	PHP_ME(WeakReference, get,             arginfo_wr_weakref_void,            ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -254,21 +196,22 @@ PHP_MINIT_FUNCTION(wr_weakref) /* {{{ */
 {
 	zend_class_entry weakref_ce;
 
-	INIT_CLASS_ENTRY(weakref_ce, "WeakReference", wr_funcs_WeakRef);
+	INIT_CLASS_ENTRY(weakref_ce, "WeakReference", wr_funcsWeakReference);
 
-	wr_ce_WeakRef = zend_register_internal_class(&weakref_ce);
+	wr_ceWeakReference = zend_register_internal_class(&weakref_ce);
 
-	wr_ce_WeakRef->ce_flags      |= ZEND_ACC_FINAL;
-	wr_ce_WeakRef->create_object  = wr_weakref_object_new;
+	wr_ceWeakReference->ce_flags      |= ZEND_ACC_FINAL;
+	wr_ceWeakReference->create_object  = wr_weakref_object_new;
 
-	memcpy(&wr_handler_WeakRef, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+	memcpy(&wr_handlerWeakReference, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
 
-	wr_handler_WeakRef.clone_obj = wr_weakref_object_clone;
-	wr_handler_WeakRef.free_obj  = wr_weakref_object_free_storage;
-	wr_handler_WeakRef.offset    = XtOffsetOf(wr_weakref_object, std);
+	wr_handlerWeakReference.clone_obj = NULL;
+	wr_handlerWeakReference.free_obj  = wr_weakref_object_free_storage;
+	wr_handlerWeakReference.offset    = XtOffsetOf(wr_weakref_object, std);
 
 	return SUCCESS;
 }
+/* }}} */
 
 /*
  * Local variables:

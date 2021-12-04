@@ -28,7 +28,6 @@ typedef struct _wr_weakref_object {
 	wr_store              *store;
 	zend_object           *ref_obj;
 	zend_bool              valid;
-	unsigned int           acquired;
 	zend_object            std;
 } wr_weakref_object;
 

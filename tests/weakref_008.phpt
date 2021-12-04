@@ -3,7 +3,7 @@ Weakref: zval splitting causes crash
 --FILE--
 <?php
 $obj = new StdClass();
-$ref = new WeakReference($obj);
+$ref = WeakReference::create($obj);
 echo "get...\n";
 $obj = $ref->get();
 echo "unset...\n";

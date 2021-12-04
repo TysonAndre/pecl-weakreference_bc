@@ -4,7 +4,7 @@ Weakref: Crash
 <?php
 class RefHolder {
   function __construct($o) {
-    $this->o = new WeakReference($o);
+    $this->o = WeakReference::create($o);
   }
   function __destruct() {
     echo "Destroying RefHolder\n";

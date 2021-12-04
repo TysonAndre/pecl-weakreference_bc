@@ -13,7 +13,7 @@ Weakref: Destroying the weakref and its object after a fatal error
 		public $ref;
 
 		function __construct($a) {
-			$this->ref = new WeakReference($a);
+			$this->ref = WeakReference::create($a);
 		}
 
 		function __destruct() {

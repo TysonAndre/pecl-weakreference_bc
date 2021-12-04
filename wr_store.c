@@ -45,7 +45,6 @@ void wr_store_destroy() /* {{{ */
 	zend_object_dtor_obj_t     orig_dtor;
 	zend_object_handlers *handlers;
 
-	/*
 	uint32_t handle;
 	ZEND_HASH_FOREACH_NUM_KEY(&store->objs, handle) {
 		zend_object *obj = EG(objects_store).object_buckets[handle];
@@ -61,7 +60,6 @@ void wr_store_destroy() /* {{{ */
 	ZEND_HASH_FOREACH_PTR(&store->replacement_handlers, handlers) {
 		efree(handlers);
 	} ZEND_HASH_FOREACH_END();
-	*/
 
 	zend_hash_destroy(&store->old_handlers);
 	zend_hash_destroy(&store->replacement_handlers);
