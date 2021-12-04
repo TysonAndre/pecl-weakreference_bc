@@ -51,25 +51,20 @@ http://pear.php.net/dtd/package-2.0.xsd">
    <file role='test' name='tests/weakmap_004.phpt'/>
    <file role='test' name='tests/weakmap_005.phpt'/>
    <file role='test' name='tests/weakref_001.phpt'/>
-   <file role='test' name='tests/weakref_002.phpt'/>
    <file role='test' name='tests/weakref_003.phpt'/>
-   <file role='test' name='tests/weakref_004.phpt'/>
-   <file role='test' name='tests/weakref_005.phpt'/>
    <file role='test' name='tests/weakref_006.phpt'/>
    <file role='test' name='tests/weakref_007.phpt'/>
    <file role='test' name='tests/weakref_008.phpt'/>
    <file role='test' name='tests/weakref_009.phpt'/>
    <file role='test' name='tests/weakref_010.phpt'/>
    <file role='test' name='tests/weakref_011.phpt'/>
-   <file role='test' name='tests/weakref_012.phpt'/>
-   <file role='test' name='tests/weakref_013.phpt'/>
    <file role='test' name='tests/weakref_014.phpt'/>
   </dir> <!-- / -->
  </contents>
  <dependencies>
   <required>
    <php>
-    <min>7.0.0</min>
+    <min>7.1.0</min>
     <max>8.0.0</max>
    </php>
    <pearinstaller>
@@ -77,7 +72,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
    </pearinstaller>
   </required>
  </dependencies>
- <providesextension>weakref</providesextension>
+ <providesextension>weakreference_bc</providesextension>
  <extsrcrelease/>
  <changelog>
   <release>
