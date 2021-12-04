@@ -21,6 +21,9 @@
 #ifndef WR_WEAKREF_H
 #define WR_WEAKREF_H
 
+#include "php_version.h"
+/* PHP 7.4 has its own WeakReference class */
+#if PHP_VERSION_ID < 70400
 #include "php_weakref.h"
 #include "wr_store.h"
 
@@ -34,6 +37,7 @@ typedef struct _wr_weakref_object {
 extern WEAKREF_API zend_class_entry *wr_ce_WeakRef;
 
 PHP_MINIT_FUNCTION(wr_weakref);
+#endif
 
 #endif /* WR_WEAKREF_H */
 

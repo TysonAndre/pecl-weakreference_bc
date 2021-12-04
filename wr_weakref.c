@@ -22,13 +22,15 @@
 # include "config.h"
 #endif
 
+#include "php_version.h"
+#if PHP_VERSION_ID < 70400
+
 #include "php.h"
 #include "zend_exceptions.h"
 #include "ext/standard/info.h"
 #include "ext/spl/spl_exceptions.h"
 #include "wr_weakref.h"
 #include "php_weakref.h"
-
 zend_object_handlers wr_handlerWeakReference;
 WEAKREF_API zend_class_entry  *wr_ceWeakReference;
 
@@ -169,10 +171,17 @@ PHP_METHOD(WeakReference, create)
 #define weakref_unsupported(thing) \
 	zend_throw_error(NULL, "WeakReference objects do not support " thing);
 
-static ZEND_COLD zval* wr_weakref_no_write(zval *object, zval *member, zval *value, void **rtc) {
+#if PHP_VERSION_ID >= 70400
+static ZEND_COLD zval* wr_weakref_no_write(zval *object, zval *member, zval *value, void **rtc)
+#else
+static ZEND_COLD void wr_weakref_no_write(zval *object, zval *member, zval *value, void **rtc)
+#endif
+{
 	weakref_unsupported("properties");
 
+#if PHP_VERSION_ID >= 70400
 	return &EG(uninitialized_zval);
+#endif
 }
 
 static ZEND_COLD zval* wr_weakref_no_read(zval *object, zval *member, int type, void **rtc, zval *rv) {
@@ -243,6 +252,7 @@ PHP_MINIT_FUNCTION(wr_weakref) /* {{{ */
 }
 /* }}} */
 
+#endif
 /*
  * Local variables:
  * tab-width: 4
