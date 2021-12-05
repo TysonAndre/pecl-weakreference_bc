@@ -83,7 +83,7 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <dependencies>
   <required>
    <php>
-    <min>7.1.0</min>
+    <min>7.0.0</min>
     <max>8.0.0</max>
    </php>
    <pearinstaller>

@@ -83,9 +83,15 @@ PHP_MINFO_FUNCTION(weakreference_bc) /* {{{ */
 }
 /* }}} */
 
+static const zend_module_dep weakreference_bc_deps[] = { /* {{{ */
+	ZEND_MOD_CONFLICTS("weakrefs")
+	ZEND_MOD_END
+};
+/* }}} */
+
 zend_module_entry weakreference_bc_module_entry = { /* {{{ */
 	STANDARD_MODULE_HEADER_EX, NULL,
-	NULL,
+	weakreference_bc_deps,
 	"weakreference_bc",
 	NULL,
 	PHP_MINIT(weakreference_bc),

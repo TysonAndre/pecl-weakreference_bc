@@ -11,7 +11,8 @@ ADD *.sh *.c *.h *.php *.md config.m4 config.w32 package.xml LICENSE CREDITS ./
 # Add tests after compiling so that it's faster to update tests and re-run them locally.
 #
 # Use extremely strict CFLAGS for checking correctness of code before merging it.
-RUN export CFLAGS='-fno-common -Wformat-truncation -Wlogical-op -Wduplicated-cond -Wall -Wextra -Wno-unused-parameter -O2 -g -Wimplicit-fallthrough=1'; phpize && ./configure && make -j$(nproc) && make install
+# docker hub 7.0 image is too old for -Wformat-truncation  -Wimplicit-fallthrough=1
+RUN export CFLAGS='-fno-common -Wlogical-op -Wduplicated-cond -Wall -Wextra -Wno-unused-parameter -O2 -g'; phpize && ./configure && make -j$(nproc) && make install
 RUN docker-php-ext-enable weakreference_bc
 ADD tests ./tests
 ADD ci ./ci
