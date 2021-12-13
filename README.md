@@ -11,6 +11,15 @@ information to objects. Indeed, the cache entry should not be preventing the
 garbage collection of the object AND the cached info when the object is no
 longer used.
 
+## Limitations
+
+This approach (of replacing the pointer to the object handlers, which pointed to read-only data since PHP 7.3)  will change the last 16 bytes of the 32-byte `spl_object_hash` of an object.
+This will also change the value of SplObjectStorage::getHash().
+
+Note that SplObjectStorage only uses the object id (same number as `spl_object_id($number)`) for internally looking up objects - there can't be more than one object *at a given point in time* with the same id.
+
+Applications using `spl_object_hash` with this PECL should switch to `spl_object_id` instead, and check that `vendor` dependencies do not depend on `spl_object_hash`.
+
 ## WeakReference
 The WeakReference class is a simple class that allows to access its referenced object
 as long as it exists. Unlike other references, having this WeakReference object will
