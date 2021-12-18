@@ -31,3 +31,4 @@ install-sh
 *.la
 *.swp
 test.php
+*.tgz
