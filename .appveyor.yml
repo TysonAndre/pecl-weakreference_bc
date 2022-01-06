@@ -170,6 +170,7 @@ test_script:
                 cd c:\projects\weakreference_bc
                 echo "" | Out-File -Encoding "ASCII" task.bat
                 echo "set REPORT_EXIT_STATUS=1" | Out-File -Encoding "ASCII" -Append task.bat
+                echo "set TEST_PHP_ARGS=--show-diff" | Out-File -Encoding "ASCII" -Append task.bat
                 $cmd = 'call configure --enable-weakreference_bc --with-prefix=c:\build-cache\' + $dname + " 2>&1"
                 echo $cmd | Out-File -Encoding "ASCII" -Append task.bat
                 echo "nmake /nologo test TESTS=-q 2>&1" | Out-File -Encoding "ASCII" -Append task.bat
