@@ -32,6 +32,11 @@
 #include "wr_store.h"
 #include "php_weakref.h"
 
+typedef struct _wr_weakmap_iterator {
+	zend_object_iterator it;
+	uint32_t ht_iter;
+} wr_weakmap_iterator;
+
 zend_object_handlers wr_handler_WeakMap;
 WEAKREF_API zend_class_entry  *wr_ce_WeakMap;
 
@@ -237,82 +242,86 @@ PHP_METHOD(WeakMap, offsetUnset)
 
 } /* }}} */
 
-/* {{{ proto void WeakMap::rewind()
- Rewind to first position */
-PHP_METHOD(WeakMap, rewind)
-{
-	wr_weakmap_object *wmap = Z_WEAKMAP_OBJ_P(getThis());
-
-	if (zend_parse_parameters_none() == FAILURE) {
-		return;
-	}
-
-	zend_hash_internal_pointer_reset_ex(&wmap->map, &wmap->pos);
+static HashPosition *wr_weakmap_iterator_get_pos_ptr(wr_weakmap_iterator *iter) { /* {{{ */
+	ZEND_ASSERT(iter->ht_iter != (uint32_t) -1);
+	return &EG(ht_iterators)[iter->ht_iter].pos;
 } /* }}} */
 
-/* {{{ proto bool WeakMap::valid()
- Returns whether current position is valid */
-PHP_METHOD(WeakMap, valid)
+static void wr_weakmap_iterator_dtor(zend_object_iterator *obj_iter) /* {{{ */
 {
-	wr_weakmap_object *wmap = Z_WEAKMAP_OBJ_P(getThis());
-
-	if (zend_parse_parameters_none() == FAILURE) {
-		return;
-	}
-
-	RETURN_BOOL(zend_hash_has_more_elements_ex(&wmap->map, &wmap->pos) == SUCCESS);
+	wr_weakmap_iterator *iter = (wr_weakmap_iterator *) obj_iter;
+	zend_hash_iterator_del(iter->ht_iter);
+	zval_ptr_dtor(&iter->it.data);
 } /* }}} */
 
-/* {{{ proto mixed WeakMap::key()
- Returns current key */
-PHP_METHOD(WeakMap, key)
+static int wr_weakmap_iterator_valid(zend_object_iterator *obj_iter) /* {{{ */
 {
-	wr_weakmap_object *wmap = Z_WEAKMAP_OBJ_P(getThis());
-
-	zval *refval_zv = zend_hash_get_current_data_ex(&wmap->map, &wmap->pos);
-
-	if (refval_zv) {
-		wr_weakmap_refval *refval = Z_PTR_P(refval_zv);
-		zval ret;
-		ZVAL_OBJ(&ret, refval->ref);
-
-		RETURN_ZVAL(&ret, 1, 0);
-	} else {
-		RETURN_NULL();
-	}
+	wr_weakmap_iterator *iter = (wr_weakmap_iterator *) obj_iter;
+	wr_weakmap *wm = wr_weakmap_fetch(&iter->it.data);
+	HashPosition *pos = wr_weakmap_iterator_get_pos_ptr(iter);
+	return zend_hash_has_more_elements_ex(&wm->ht, pos);
 } /* }}} */
 
-/* {{{ proto mixed WeakMap::current()
- Returns current element */
-PHP_METHOD(WeakMap, current)
+static zval *wr_weakmap_iterator_get_current_data(zend_object_iterator *obj_iter) /* {{{ */
 {
-	wr_weakmap_object *wmap = Z_WEAKMAP_OBJ_P(getThis());
-
-	if (zend_parse_parameters_none() == FAILURE) {
-		return;
-	}
-
-	zval *refval_zv = zend_hash_get_current_data_ex(&wmap->map, &wmap->pos);
-
-	if (refval_zv) {
-		wr_weakmap_refval *refval = Z_PTR_P(refval_zv);
-		RETURN_ZVAL(&refval->val, 1, 0);
-	} else {
-		RETURN_NULL();
-	}
+	wr_weakmap_iterator *iter = (wr_weakmap_iterator *) obj_iter;
+	wr_weakmap *wm = wr_weakmap_fetch(&iter->it.data);
+	HashPosition *pos = wr_weakmap_iterator_get_pos_ptr(iter);
+	return zend_hash_get_current_data_ex(&wm->ht, pos);
 } /* }}} */
 
-/* {{{ proto void SplObjectStorage::next()
- Moves position forward */
-PHP_METHOD(WeakMap, next)
+static void wr_weakmap_iterator_get_current_key(zend_object_iterator *obj_iter, zval *key) /* {{{ */
 {
-	wr_weakmap_object *wmap = Z_WEAKMAP_OBJ_P(getThis());
+	wr_weakmap_iterator *iter = (wr_weakmap_iterator *) obj_iter;
+	wr_weakmap *wm = wr_weakmap_fetch(&iter->it.data);
+	HashPosition *pos = wr_weakmap_iterator_get_pos_ptr(iter);
 
-	if (zend_parse_parameters_none() == FAILURE) {
-		return;
+	zend_string *string_key;
+	zend_ulong num_key;
+	int key_type = zend_hash_get_current_key_ex(&wm->ht, &string_key, &num_key, pos);
+	if (key_type != HASH_KEY_IS_LONG) {
+		ZEND_ASSERT(0 && "Must have integer key");
 	}
 
-	zend_hash_move_forward_ex(&wmap->map, &wmap->pos);
+	ZVAL_OBJ_COPY(key, (zend_object *) num_key);
+} /* }}} */
+
+static void wr_weakmap_iterator_move_forward(zend_object_iterator *obj_iter) /* {{{ */
+{
+	wr_weakmap_iterator *iter = (wr_weakmap_iterator *) obj_iter;
+	wr_weakmap *wm = wr_weakmap_fetch(&iter->it.data);
+	HashPosition *pos = wr_weakmap_iterator_get_pos_ptr(iter);
+	zend_hash_move_forward_ex(&wm->ht, pos);
+} /* }}} */
+
+static void wr_weakmap_iterator_rewind(zend_object_iterator *obj_iter) /* {{{ */
+{
+	wr_weakmap_iterator *iter = (wr_weakmap_iterator *) obj_iter;
+	wr_weakmap *wm = wr_weakmap_fetch(&iter->it.data);
+	HashPosition *pos = wr_weakmap_iterator_get_pos_ptr(iter);
+	zend_hash_internal_pointer_reset_ex(&wm->ht, pos);
+} /* }}} */
+
+static const zend_object_iterator_funcs wr_weakmap_iterator_funcs = {
+	wr_weakmap_iterator_dtor,
+	wr_weakmap_iterator_valid,
+	wr_weakmap_iterator_get_current_data,
+	wr_weakmap_iterator_get_current_key,
+	wr_weakmap_iterator_move_forward,
+	wr_weakmap_iterator_rewind,
+	NULL,
+	NULL, /* get_gc */
+};
+static zend_object_iterator *wr_weakmap_get_iterator(zend_class_entry *ce, zval *object, int by_ref) /* {{{ */
+{
+	/* by_ref is int due to Iterator API */
+	wr_weakmap *wm = wr_weakmap_fetch(object);
+	wr_weakmap_iterator *iter = emalloc(sizeof(wr_weakmap_iterator));
+	zend_iterator_init(&iter->it);
+	iter->it.funcs = &wr_weakmap_iterator_funcs;
+	ZVAL_COPY(&iter->it.data, object);
+	iter->ht_iter = zend_hash_iterator_add(&wm->ht, 0);
+	return &iter->it;
 } /* }}} */
 
 /* {{{ proto noreturn WeakMap::__wakeup()
