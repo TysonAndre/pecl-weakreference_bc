@@ -59,8 +59,10 @@ http://pear.php.net/dtd/package-2.0.xsd">
     <file name="weakmap_dtor_exception.phpt" role="test" />
     <file name="weakmap_error_conditions.phpt" role="test" />
     <file name="weakmap_iteration.phpt" role="test" />
+    <file name="weakmap_iteration_simple.phpt" role="test" />
     <file name="weakmap_multiple_weakrefs.phpt" role="test" />
     <file name="weakmap_nested.phpt" role="test" />
+    <file name="weakmap_unchanged_hash.phpt" role="test" />
     <file name="weakmap_weakness.phpt" role="test" />
     <file name="weakref_001.phpt" role="test" />
     <file name="weakref_003.phpt" role="test" />
