@@ -15,10 +15,10 @@ http://pear.php.net/dtd/package-2.0.xsd">
   <email>tandre@php.net</email>
   <active>yes</active>
  </lead>
- <date>2022-01-05</date>
+ <date>2022-01-06</date>
  <version>
-  <release>0.4.0</release>
-  <api>0.4.0</api>
+  <release>0.4.1</release>
+  <api>0.4.1</api>
  </version>
  <stability>
   <release>beta</release>
@@ -26,12 +26,10 @@ http://pear.php.net/dtd/package-2.0.xsd">
  </stability>
  <license uri="https://www.php.net/license">PHP</license>
  <notes>
-- Fork this from the abandoned "weakref" PECL to provide WeakMap for php 7.0-7.4 and WeakReference for php 7.0-7.3
-- Fix compilation errors for WeakMap in php 7.4
-- Rename WeakRef to WeakReference to act as a polyfill for WeakReference in php before php 7.4.
-- Make WeakReference constructor throw and require the use of WeakReference::create, like php 7.4
-- Fix edge cases when destructor of an old value modifies the weakmap during an update.
-- Strictly prevent the creation of dynamic properties on a WeakReference.
+- Fix windows build issues.
+- Stop using the nonstandard `ulong` type.
+- Fix typo in PECL conflicts section with weakref PECL.
+- Change configure flag to enable/disable this extension to --enable-weakreference_bc
  </notes>
  <contents>
   <dir name="/">
@@ -96,6 +94,34 @@ http://pear.php.net/dtd/package-2.0.xsd">
  <providesextension>weakreference_bc</providesextension>
  <extsrcrelease/>
  <changelog>
+  <release>
+   <date>2022-01-05</date>
+   <version>
+    <release>0.4.0</release>
+    <api>0.4.0</api>
+   </version>
+   <stability>
+    <release>beta</release>
+    <api>beta</api>
+   </stability>
+   <license uri="https://www.php.net/license">PHP</license>
+   <notes>
+- Fork this from the abandoned "weakref" PECL to provide WeakMap for php 7.0-7.4 and WeakReference for php 7.0-7.3
+- Fix compilation errors for WeakMap in php 7.4
+- Rename WeakRef to WeakReference to act as a polyfill for WeakReference in php before php 7.4.
+- Make WeakReference constructor throw and require the use of WeakReference::create, like php 7.4
+- Fix edge cases when destructor of an old value modifies the weakmap during an update.
+- Strictly prevent the creation of dynamic properties on a WeakReference.
+   </notes>
+  </release>
+  <release>
+   <stability><release>beta</release><api>beta</api></stability>
+   <version><release>0.3.2</release><api>0.3.1</api></version>
+   <date>2016-01-24</date>
+   <notes>
+- Fix crash in wr_store_tracked_object_dtor
+   </notes>
+  </release>
   <release>
    <stability><release>beta</release><api>beta</api></stability>
    <version><release>0.3.3</release><api>0.3.1</api></version>
