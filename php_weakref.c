@@ -29,6 +29,10 @@
 #include "wr_store.h"
 #include "php_weakref.h"
 
+#if PHP_VERSION_ID >= 80000
+#error weakreference_bc PECL is a polyfill for PHP versions older than 8.0. It is not needed in php 8.
+#endif
+
 #ifdef ZTS
 int weakreference_bc_globals_id;
 #else
