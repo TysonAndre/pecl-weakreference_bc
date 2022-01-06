@@ -3,5 +3,5 @@
 ARG_ENABLE("weakreference_bc", "WeakReference/WeakRef polyfill support", "no");
 
 if (PHP_WEAKREFERENCE_BC != "no") {
-  EXTENSION("weakreference_bc", "php_weakref.c wr_store.c wr_weakref.c wr_weakmap.c", PHP_WEAKREF_SHARED);
+  EXTENSION("weakreference_bc", "php_weakref.c wr_store.c wr_weakref.c wr_weakmap.c", PHP_WEAKREFERENCE_BC_SHARED);
 }
