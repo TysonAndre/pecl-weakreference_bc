@@ -1,6 +1,8 @@
 # The weakreference_bc PECL extension
 
 [![Build Status](https://github.com/TysonAndre/pecl-weakreference_bc/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/TysonAndre/pecl-weakreference_bc/actions/workflows/main.yml?query=branch%3Amaster)
+[![Build Status (Windows)](https://ci.appveyor.com/api/projects/status/5duym2sdcy348e67?svg=true)](https://ci.appveyor.com/project/TysonAndre/pecl-weakreference-bc)
+
 
 **[weakreference_bc](https://github.com/TysonAndre/pecl-weakreference_bc) is a fork of the unmaintained https://pecl.php.net/weakref PECL. The `weakreference_bc` PECL changes the API to provide polyfills for [WeakReference](https://www.php.net/manual/en/class.weakreference.php)/[WeakMap](https://www.php.net/manual/en/class.weakmap.php)**
 
