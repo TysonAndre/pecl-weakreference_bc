@@ -1,6 +1,6 @@
 /*
    +----------------------------------------------------------------------+
-   | Weakref                                                        |
+   | weakreference_bc                                                     |
    +----------------------------------------------------------------------+
    | Copyright (c) 1997-2011 The PHP Group                                |
    +----------------------------------------------------------------------+
@@ -12,11 +12,10 @@
    | obtain it through the world-wide-web, please send a note to          |
    | license@php.net so we can mail you a copy immediately.               |
    +----------------------------------------------------------------------+
-   | Authors: Etienne Kneuss <colder@php.net>                             |
+   | Authors: Etienne Kneuss <colder@php.net> (original weakref PECL)     |
+   | Authors: Tyson Andre <tandre@php.net> (weakreference_bc)             |
    +----------------------------------------------------------------------+
  */
-
-/* $Id$ */
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
