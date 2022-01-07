@@ -102,3 +102,10 @@ foreach($wm as $k => $v) {
 ## Limitations
 
 Prior to php 7.0.3, using an object with `WeakReference::create` or as a key in an entry of of `WeakMap` would cause this to change the value of `spl_object_hash` and `SplObjectStorage::getHash`.
+
+## Alternatives
+
+A userland polyfill for WeakMap for php 7.4+ is https://github.com/BenMorel/weakmap-polyfill . That library offers a compatible implementation with the native WeakMap, but:
+
+- slower
+- whose values are not removed as soon as the object key is destroyed, but when you use the WeakMap again (eventually triggering housekeeping); note that this affects when object destructors are called as well
