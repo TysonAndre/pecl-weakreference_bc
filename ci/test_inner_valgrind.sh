@@ -6,6 +6,12 @@ set -xeu
 echo "Run tests in docker"
 php --version
 php --ini
-REPORT_EXIT_STATUS=1 make test TESTS="-P -q --show-diff -m --show-mem"
+export REPORT_EXIT_STATUS=1
+if ! make test TESTS="-P -q --show-diff -m"; then
+    echo "Tests failed"
+    head -n999 tests/*.mem
+    exit 1
+fi
+
 echo "Test that package.xml is valid"
 pecl package
